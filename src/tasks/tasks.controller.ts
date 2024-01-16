@@ -22,19 +22,18 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
   private readonly logger = new Logger(TasksController.name);
 
-  @Get()
-  getAllTasks(): Task[] {
-    return this.tasksService.getAllTasks();
+  async getAllTasks(): Promise<Task[]> {
+    return await this.tasksService.getAllTasks();
   }
 
-  @Post()
   @UsePipes(ValidationPipe)
-  createTask(@Body() createTaskDto: CreateTaskDtoTs): Task {
+  @Post()
+  createTask(@Body() createTaskDto: CreateTaskDtoTs): Promise<Task> {
     return this.tasksService.createTask(createTaskDto);
   }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Task {
+  getTaskById(@Param('id') id: string): Promise<Task> {
     return this.tasksService.getTaskById(id);
   }
 
@@ -53,12 +52,15 @@ export class TasksController {
   updateTaskStatus(
     @Param('id') id: string,
     @Body('status', TaskStatusValidationPipe) taskStatus: TaskStatus,
-  ): Task {
+  ): Promise<Task> {
     return this.tasksService.updateTaskStatus(id, taskStatus);
   }
 
   @Get()
-  getTasks(@Query(ValidationPipe) filterTaskDto: GetTasksFilterDto): Task[] {
+  async getTasks(
+    @Query(ValidationPipe) filterTaskDto: GetTasksFilterDto,
+  ): Promise<Task[]> {
+    this.logger.verbose(`${JSON.stringify(filterTaskDto)}`);
     if (Object.keys(filterTaskDto).length) {
       return this.tasksService.getTasksWithFilters(filterTaskDto);
     }
