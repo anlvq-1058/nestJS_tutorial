@@ -9,6 +9,7 @@ import {
   Query,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { Task, TaskStatus } from './task.model';
@@ -16,8 +17,10 @@ import { CreateTaskDtoTs } from './dto/create-task.dto.ts/create-task.dto';
 import { Logger } from '@nestjs/common';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatusValidationPipe } from './pipes/task-status-validation.pipe';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tasks')
+@UseGuards(AuthGuard()) // AuthGuard('jwt')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
   private readonly logger = new Logger(TasksController.name);
