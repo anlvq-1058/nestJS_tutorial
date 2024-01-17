@@ -10,14 +10,18 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Task, TaskStatus } from './task.model';
+import { TaskStatus } from './task.model';
 import { CreateTaskDtoTs } from './dto/create-task.dto.ts/create-task.dto';
 import { Logger } from '@nestjs/common';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatusValidationPipe } from './pipes/task-status-validation.pipe';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/auth/entities/auth.entity';
+import { Request } from 'express';
+import { Task as TaskEntity } from './entities/task.entity';
 
 @Controller('tasks')
 @UseGuards(AuthGuard()) // AuthGuard('jwt')
@@ -25,24 +29,31 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
   private readonly logger = new Logger(TasksController.name);
 
-  async getAllTasks(): Promise<Task[]> {
+  async getAllTasks(): Promise<TaskEntity[]> {
     return await this.tasksService.getAllTasks();
   }
 
   @UsePipes(ValidationPipe)
   @Post()
-  createTask(@Body() createTaskDto: CreateTaskDtoTs): Promise<Task> {
-    return this.tasksService.createTask(createTaskDto);
+  createTask(
+    @Body() createTaskDto: CreateTaskDtoTs,
+    @Req() req: Request,
+  ): Promise<TaskEntity> {
+    this.logger.verbose(`${JSON.stringify(req.user)}`);
+    return this.tasksService.createTask(createTaskDto, req.user as User);
   }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  getTaskById(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ): Promise<TaskEntity> {
+    return this.tasksService.getTaskById(id, req.user as User);
   }
 
   @Delete('/:id')
-  deleteTaskById(@Param('id') id: string): string {
-    const taskDeleted = this.tasksService.deleteTaskById(id);
+  deleteTaskById(@Param('id') id: string, @Req() req: Request): string {
+    const taskDeleted = this.tasksService.deleteTaskById(id, req.user as User);
 
     if (!taskDeleted) {
       return 'Somgthing went wrong when delete task!';
@@ -55,14 +66,17 @@ export class TasksController {
   updateTaskStatus(
     @Param('id') id: string,
     @Body('status', TaskStatusValidationPipe) taskStatus: TaskStatus,
-  ): Promise<Task> {
-    return this.tasksService.updateTaskStatus(id, taskStatus);
+    @Req() req: Request,
+  ): Promise<TaskEntity> {
+    return this.tasksService.updateTaskStatus(id, taskStatus, req.user as User);
   }
 
   @Get()
   async getTasks(
     @Query(ValidationPipe) filterTaskDto: GetTasksFilterDto,
-  ): Promise<Task[]> {
+    @Req() req: Request,
+  ): Promise<TaskEntity[]> {
+    this.logger.verbose(`abc ${JSON.stringify(req.user)}`);
     this.logger.verbose(`${JSON.stringify(filterTaskDto)}`);
     if (Object.keys(filterTaskDto).length) {
       return this.tasksService.getTasksWithFilters(filterTaskDto);
