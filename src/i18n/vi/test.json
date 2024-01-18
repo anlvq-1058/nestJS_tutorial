@@ -1,0 +1,7 @@
+{
+  "not_found": "Không tìm thấy",
+  "success": "Thành công",
+  "error": "Lỗi",
+  "invalid_token": "token không hợp lệ",
+  "fail": "Thât bại"
+}

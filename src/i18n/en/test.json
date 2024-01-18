@@ -1,0 +1,7 @@
+{
+  "not_found": "Not Found",
+  "success": "Success",
+  "error": "Error",
+  "invalid_token": "Invalid Token",
+  "fail": "Fail"
+}
