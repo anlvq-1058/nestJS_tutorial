@@ -11,6 +11,8 @@ import {
   ValidationPipe,
   UseGuards,
   Req,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { TaskStatus } from './task.model';
@@ -44,6 +46,7 @@ export class TasksController {
   }
 
   @Get('/:id')
+  @UseInterceptors(ClassSerializerInterceptor)
   getTaskById(
     @Param('id') id: string,
     @Req() req: Request,
