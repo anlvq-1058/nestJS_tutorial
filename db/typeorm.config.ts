@@ -1,7 +1,7 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import 'dotenv/config';
 
-const config: TypeOrmModuleOptions = {
+export default new DataSource({
   type: 'mysql',
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT),
@@ -13,6 +13,4 @@ const config: TypeOrmModuleOptions = {
   migrations: ['db/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',
   logging: true,
-};
-
-export default config;
+});
