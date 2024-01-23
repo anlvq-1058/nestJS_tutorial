@@ -17,6 +17,9 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Column()
+  salt: string;
+
   @OneToMany(() => Task, (task) => task.user, { eager: true })
   tasks: Task[];
 }
